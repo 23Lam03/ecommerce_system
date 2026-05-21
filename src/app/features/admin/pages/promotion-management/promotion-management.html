@@ -1,0 +1,64 @@
+<!-- AD-ADM10: Quản lý khuyến mãi -->
+<div class="p-6 lg:p-8">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Quản lý khuyến mãi</h1>
+      <p class="text-sm text-slate-500 mt-1">
+        Mã màn hình: <span class="font-mono text-indigo-600">AD-ADM10</span>
+        <span class="ml-2">· {{ promotions().length }} chương trình</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Promotions grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    @for (promo of promotions(); track promo.id) {
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden" [class.opacity-60]="promo.status === 'expired'">
+        <div class="p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="font-mono font-bold text-lg text-indigo-700">{{ promo.code }}</span>
+            <span class="px-2.5 py-1 rounded-full text-xs font-semibold" [class]="statusClass(promo.status)">
+              {{ statusLabel(promo.status) }}
+            </span>
+          </div>
+          <h3 class="font-semibold text-slate-800 mb-1">{{ promo.title }}</h3>
+          <p class="text-sm text-slate-600 mb-3 line-clamp-2">{{ promo.description }}</p>
+          <div class="text-2xl font-bold text-slate-900 mb-3">
+            {{ promo.type === 'percentage' ? promo.value + '%' : fmtCurrency(promo.value) }} GIẢM
+          </div>
+          <div class="text-xs text-slate-500 space-y-1">
+            <p>Đơn tối thiểu: {{ fmtCurrency(promo.minOrder) }}</p>
+            <p>Giảm tối đa: {{ fmtCurrency(promo.maxDiscount) }}</p>
+            <p>HSD: {{ fmtDate(promo.endDate) }}</p>
+            <p class="mt-2">
+              <span class="px-2 py-0.5 rounded-lg bg-indigo-50 text-indigo-700">
+                {{ targetLabel(promo.target) }}
+              </span>
+            </p>
+          </div>
+        </div>
+        <div class="border-t border-slate-100 px-5 py-3 flex gap-2">
+          <button
+            type="button"
+            (click)="toggleStatus(promo.id)"
+            class="flex-1 py-2 text-xs font-medium border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+          >
+            {{ promo.status === 'active' ? 'Tạm ngưng' : 'Kích hoạt' }}
+          </button>
+          <button
+            type="button"
+            (click)="deletePromotion(promo.id)"
+            class="px-3 py-2 text-xs font-medium border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+          >
+            Xóa
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="col-span-full text-center py-16 text-slate-400 bg-white rounded-2xl border border-slate-200">
+        Chưa có chương trình khuyến mãi nào
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,99 @@
+<!-- AD-ADM08: Quản lý hỗ trợ -->
+<div class="p-6 lg:p-8">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">Hỗ trợ kỹ thuật</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Mã màn hình: <span class="font-mono text-indigo-600">AD-ADM08</span>
+    </p>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex flex-wrap gap-2 mb-6">
+    @for (s of ['all', 'open', 'in_progress', 'resolved', 'closed']; track s) {
+      <button
+        type="button"
+        (click)="statusFilter.set($any(s))"
+        class="px-3 py-2 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
+        [class]="statusFilter() === s
+          ? 'bg-indigo-600 text-white border-indigo-600'
+          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+      >
+        {{ s === 'all' ? 'Tất cả' : statusLabel(s) }}
+      </button>
+    }
+  </div>
+
+  <!-- Tickets list -->
+  <div class="space-y-4">
+    @for (ticket of tickets(); track ticket.id) {
+      @if (statusFilter() === 'all' || ticket.status === statusFilter()) {
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 bg-slate-50 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 font-bold text-sm flex items-center justify-center">
+                {{ ticket.customerName.charAt(0) }}
+              </div>
+              <div>
+                <p class="font-semibold text-slate-800">{{ ticket.customerName }}</p>
+                <p class="text-xs text-slate-500">{{ ticket.email }}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600">{{ typeLabel(ticket.type) }}</span>
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold" [class]="statusClass(ticket.status)">
+                {{ statusLabel(ticket.status) }}
+              </span>
+            </div>
+          </div>
+          <div class="p-5">
+            <h3 class="font-semibold text-slate-800">{{ ticket.subject }}</h3>
+            <p class="text-xs text-slate-400 mt-1">ID: #{{ ticket.id }} · {{ fmtDate(ticket.createdAt) }}</p>
+
+            @if (replyingTo() === ticket.id) {
+              <div class="mt-4 bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+                <p class="text-sm font-semibold text-indigo-700 mb-2">Phản hồi:</p>
+                <textarea
+                  [value]="replyText()"
+                  (input)="replyText.set($any($event.target).value)"
+                  rows="3"
+                  placeholder="Nhập nội dung phản hồi..."
+                  class="w-full px-4 py-2.5 text-sm border border-indigo-300 rounded-xl resize-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+                ></textarea>
+                <div class="flex gap-2 mt-2">
+                  <button type="button" (click)="submitReply(ticket.id)"
+                    class="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 cursor-pointer">
+                    Gửi phản hồi
+                  </button>
+                  <button type="button" (click)="replyingTo.set(null)"
+                    class="px-4 py-2 border border-indigo-300 text-indigo-700 text-sm rounded-lg hover:bg-indigo-100 cursor-pointer">
+                    Hủy
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <div class="flex gap-2 mt-3">
+                @if (ticket.status !== 'closed') {
+                  <button type="button" (click)="startReply(ticket.id)"
+                    class="px-4 py-2 text-sm bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 cursor-pointer">
+                    Phản hồi
+                  </button>
+                }
+                @if (ticket.status !== 'closed' && ticket.status !== 'resolved') {
+                  <button type="button" (click)="closeTicket(ticket.id)"
+                    class="px-4 py-2 text-sm border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 cursor-pointer">
+                    Đóng ticket
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    } @empty {
+      <div class="text-center py-16 text-slate-400 bg-white rounded-2xl border border-slate-200">
+        Không có ticket nào
+      </div>
+    }
+  </div>
+</div>

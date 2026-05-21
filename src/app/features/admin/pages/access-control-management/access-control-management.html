@@ -1,0 +1,79 @@
+<!-- AD-ADM11: Phân quyền truy cập -->
+<div class="p-6 lg:p-8">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">Phân quyền truy cập</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Mã màn hình: <span class="font-mono text-indigo-600">AD-ADM11</span>
+    </p>
+  </div>
+
+  <!-- Permission matrix -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm min-w-[800px]">
+        <thead>
+          <tr class="bg-slate-50 border-b border-slate-200">
+            <th class="text-left px-4 py-3 font-semibold text-slate-600 w-48">Nhân viên</th>
+            @for (perm of allPermissions; track perm.key) {
+              <th class="text-center px-2 py-3 font-semibold text-slate-600 min-w-[120px]">
+                <span class="block text-xs leading-tight">{{ perm.label }}</span>
+              </th>
+            }
+            <th class="text-center px-4 py-3 font-semibold text-slate-600 w-32">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (staff of staffList(); track staff.id) {
+            <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors" [class.opacity-50]="staff.status === 'inactive'">
+              <td class="px-4 py-3">
+                <div>
+                  <p class="font-semibold text-slate-800">{{ staff.fullName }}</p>
+                  <p class="text-xs text-slate-400">{{ staff.email }}</p>
+                  <span class="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+                    [class]="staff.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'">
+                    {{ staff.status === 'active' ? 'Hoạt động' : 'Tạm ngưng' }}
+                  </span>
+                </div>
+              </td>
+              @for (perm of allPermissions; track perm.key) {
+                <td class="px-2 py-3 text-center">
+                  <input
+                    type="checkbox"
+                    [checked]="hasPermission(staff.id, perm.key)"
+                    (change)="togglePermission(staff.id, perm.key)"
+                    class="w-4 h-4 rounded border-slate-300 text-indigo-600 cursor-pointer"
+                  />
+                </td>
+              }
+              <td class="px-4 py-3 text-center">
+                <div class="flex items-center justify-center gap-1">
+                  <button type="button" (click)="selectAll(staff.id)"
+                    class="px-2 py-1 text-xs border border-slate-200 rounded-lg hover:bg-indigo-50 cursor-pointer">
+                    Chọn all
+                  </button>
+                  <button type="button" (click)="toggleStaffStatus(staff.id)"
+                    class="px-2 py-1 text-xs border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer">
+                    {{ staff.status === 'active' ? 'Tắt' : 'Bật' }}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="flex flex-wrap gap-6 text-sm text-slate-500">
+    <p class="flex items-center gap-2">
+      <input type="checkbox" checked class="w-4 h-4 rounded border-slate-300 text-indigo-600" disabled />
+      Có quyền
+    </p>
+    <p class="flex items-center gap-2">
+      <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-slate-300" disabled />
+      Không có quyền
+    </p>
+  </div>
+</div>

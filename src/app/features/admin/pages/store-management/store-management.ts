@@ -5,13 +5,14 @@ import { NotificationService } from '../../../../core/services/notification.serv
 import { ShopInfo } from '../../../../core/models/user.model';
 import { CurrencyVndPipe } from '../../../../shared/pipes/currency-vnd.pipe';
 import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
+import { DatePipe } from '@angular/common';
 
 type ModalMode = 'add' | 'edit' | 'view' | null;
 
 @Component({
   selector: 'app-admin-store-management',
   standalone: true,
-  imports: [ReactiveFormsModule, CurrencyVndPipe, ConfirmDialog],
+  imports: [ReactiveFormsModule, CurrencyVndPipe, ConfirmDialog, DatePipe],
   templateUrl: './store-management.html',
   styleUrl: './store-management.css',
 })

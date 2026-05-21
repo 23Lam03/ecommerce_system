@@ -1,0 +1,97 @@
+<!-- AD-ADM12: Quản lý tài chính -->
+<div class="p-6 lg:p-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-900">Quản lý tài chính</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Mã màn hình: <span class="font-mono text-indigo-600">AD-ADM12</span>
+    </p>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl p-5 text-white shadow-lg shadow-indigo-200">
+      <p class="text-sm opacity-80">Tổng doanh thu toàn sàn</p>
+      <p class="text-2xl font-bold mt-1">{{ fmtCurrency(totalRevenue()) }}</p>
+    </div>
+    <div class="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-5 text-white shadow-lg shadow-emerald-200">
+      <p class="text-sm opacity-80">Phí nền tảng (2%)</p>
+      <p class="text-2xl font-bold mt-1">{{ fmtCurrency(platformRevenue()) }}</p>
+    </div>
+    <div class="bg-gradient-to-br from-violet-500 to-violet-700 rounded-2xl p-5 text-white shadow-lg shadow-violet-200">
+      <p class="text-sm opacity-80">Đơn hàng hoàn thành</p>
+      <p class="text-2xl font-bold mt-1">{{ completedOrders().length }}</p>
+    </div>
+    <div class="bg-gradient-to-br from-amber-500 to-amber-700 rounded-2xl p-5 text-white shadow-lg shadow-amber-200">
+      <p class="text-sm opacity-80">Tổng giao dịch</p>
+      <p class="text-2xl font-bold mt-1">{{ transactions().length }}</p>
+    </div>
+  </div>
+
+  <!-- Charts section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Revenue chart -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+      <h2 class="text-lg font-bold text-slate-800 mb-6">Doanh thu theo tháng</h2>
+      <div class="space-y-4">
+        @for (m of monthlyData; track m.month) {
+          <div class="flex items-center gap-4">
+            <span class="text-xs text-slate-500 w-8 shrink-0">{{ m.month }}</span>
+            <div class="flex-1 h-6 bg-slate-100 rounded-lg overflow-hidden relative">
+              <div
+                class="h-full bg-gradient-to-r from-indigo-500 to-indigo-400 rounded-lg transition-all"
+                [style.width.%]="barWidth(m.revenue)"
+              ></div>
+              <span class="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-semibold text-indigo-700">{{ (m.revenue / 1000000).toFixed(0) }}M</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Platform fee chart -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+      <h2 class="text-lg font-bold text-slate-800 mb-6">Phí nền tảng theo tháng</h2>
+      <div class="space-y-4">
+        @for (m of monthlyData; track m.month) {
+          <div class="flex items-center gap-4">
+            <span class="text-xs text-slate-500 w-8 shrink-0">{{ m.month }}</span>
+            <div class="flex-1 h-6 bg-slate-100 rounded-lg overflow-hidden relative">
+              <div
+                class="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-lg transition-all"
+                [style.width.%]="barWidth(m.platformFee * 50)"
+              ></div>
+              <span class="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-semibold text-emerald-700">{{ (m.platformFee / 1000000).toFixed(0) }}M</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Top shops by revenue -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-200">
+      <h2 class="text-lg font-bold text-slate-800">Top cửa hàng theo doanh thu</h2>
+    </div>
+    <div class="divide-y divide-slate-100">
+      @for (shop of auth.allShops().sort((a, b) => b.revenue - a.revenue); track shop.id) {
+        <div class="flex items-center justify-between px-6 py-4 hover:bg-slate-50/50 transition-colors">
+          <div class="flex items-center gap-3">
+            <img [src]="shop.logo" [alt]="shop.shopName" class="w-10 h-10 rounded-xl border border-slate-200" />
+            <div>
+              <p class="font-semibold text-slate-800">{{ shop.shopName }}</p>
+              <p class="text-xs text-slate-400">{{ shop.totalOrders }} đơn · {{ shop.totalProducts }} sản phẩm</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="font-bold text-indigo-600">{{ fmtCurrency(shop.revenue) }}</p>
+            <div class="w-24 h-1.5 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+              <div class="h-full bg-indigo-500 rounded-full" [style.width.%]="barWidth(shop.revenue)"></div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -20,8 +20,10 @@ export class ProductManagementComponent {
   private readonly notification = inject(NotificationService);
 
   protected readonly statusFilter = signal<ProductStatus | 'all'>('all');
+  protected readonly searchQuery = signal('');
   protected readonly deleteTarget = signal<Product | null>(null);
   protected readonly showDelete = signal(false);
+  protected readonly editProduct = signal<Product | null>(null);
 
   protected readonly shopId = computed(() => {
     const user = this.auth.currentUser();
@@ -32,7 +34,12 @@ export class ProductManagementComponent {
   protected readonly products = computed(() => {
     let list = this.productService.getProductsByShop(this.shopId());
     const s = this.statusFilter();
+    const q = this.searchQuery().toLowerCase().trim();
     if (s !== 'all') list = list.filter(p => p.status === s);
+    if (q) list = list.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      p.categoryName.toLowerCase().includes(q)
+    );
     return list;
   });
 
@@ -41,7 +48,12 @@ export class ProductManagementComponent {
   }
 
   protected statusClass(s: ProductStatus): string {
-    return { active: 'bg-emerald-100 text-emerald-800', inactive: 'bg-slate-200 text-slate-600', pending: 'bg-amber-100 text-amber-800', rejected: 'bg-red-100 text-red-800' }[s];
+    return {
+      active: 'bg-emerald-100 text-emerald-800',
+      inactive: 'bg-slate-200 text-slate-600',
+      pending: 'bg-amber-100 text-amber-800',
+      rejected: 'bg-red-100 text-red-800',
+    }[s];
   }
 
   protected confirmDelete(p: Product): void {
@@ -57,5 +69,11 @@ export class ProductManagementComponent {
     }
     this.showDelete.set(false);
     this.deleteTarget.set(null);
+  }
+
+  protected toggleActive(p: Product): void {
+    const next: ProductStatus = p.status === 'active' ? 'inactive' : 'active';
+    this.productService.updateProductStatus(p.id, next);
+    this.notification.success(next === 'active' ? 'Đã hiển thị sản phẩm' : 'Đã ẩn sản phẩm');
   }
 }

@@ -1,52 +1,168 @@
-<div class="p-6 lg:p-8">
+<!-- SH-PRD02: Quản lý sản phẩm Shop -->
+<section class="p-6 lg:p-8">
+  <!-- Header -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
     <div>
-      <h1 class="text-2xl font-bold text-slate-900">Sản phẩm của shop</h1>
-      <p class="text-sm text-slate-500">Mã: <span class="font-mono text-emerald-600">SH-PRD02</span></p>
+      <h1 class="text-2xl font-bold text-slate-900">Quản lý sản phẩm</h1>
+      <p class="text-sm text-slate-500 mt-1">
+        Mã màn hình: <span class="font-mono text-emerald-600">SH-PRD02</span>
+        <span class="ml-2">· {{ products().length }} sản phẩm</span>
+      </p>
     </div>
-    <a routerLink="/shop/products/new" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 cursor-pointer">
-      + Đăng sản phẩm
+    <a
+      routerLink="/shop/products/new"
+      class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-xl
+             hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Đăng sản phẩm mới
     </a>
   </div>
 
-  <select [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)" class="mb-4 px-4 py-2.5 text-sm border rounded-xl bg-white">
-    <option value="all">Tất cả</option>
-    <option value="active">Đang bán</option>
-    <option value="pending">Chờ duyệt</option>
-    <option value="inactive">Ẩn</option>
-  </select>
-
-  <div class="bg-white rounded-2xl border overflow-hidden shadow-sm">
-    <table class="w-full text-sm">
-      <thead class="bg-slate-50 border-b"><tr>
-        <th class="text-left px-4 py-3">Sản phẩm</th>
-        <th class="text-right px-4 py-3 hidden sm:table-cell">Giá</th>
-        <th class="text-center px-4 py-3">Kho</th>
-        <th class="text-center px-4 py-3">TT</th>
-        <th class="text-right px-4 py-3">Thao tác</th>
-      </tr></thead>
-      <tbody class="divide-y">
-        @for (p of products(); track p.id) {
-          <tr class="hover:bg-slate-50">
-            <td class="px-4 py-3">
-              <div class="flex items-center gap-3">
-                <img [src]="p.images[0]" class="w-10 h-10 rounded-lg object-cover" [alt]="p.name" />
-                <span class="font-medium line-clamp-1">{{ p.name }}</span>
-              </div>
-            </td>
-            <td class="px-4 py-3 text-right hidden sm:table-cell">{{ p.price | currencyVnd }}</td>
-            <td class="px-4 py-3 text-center">{{ p.stock }}</td>
-            <td class="px-4 py-3 text-center"><span class="text-xs px-2 py-1 rounded-full font-semibold" [class]="statusClass(p.status)">{{ statusLabel(p.status) }}</span></td>
-            <td class="px-4 py-3 text-right">
-              <button type="button" (click)="confirmDelete(p)" class="text-red-600 text-xs font-semibold hover:underline cursor-pointer">Xóa</button>
-            </td>
-          </tr>
-        } @empty {
-          <tr><td colspan="5" class="py-12 text-center text-slate-400">Chưa có sản phẩm</td></tr>
-        }
-      </tbody>
-    </table>
+  <!-- Filters -->
+  <div class="flex flex-col sm:flex-row gap-3 mb-6">
+    <div class="relative flex-1 max-w-sm">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input
+        type="search"
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)"
+        placeholder="Tìm theo tên, danh mục..."
+        class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
+      />
+    </div>
+    <div class="flex flex-wrap gap-2">
+      @for (s of ['all', 'active', 'inactive', 'pending', 'rejected']; track s) {
+        <button
+          type="button"
+          (click)="statusFilter.set($any(s))"
+          class="px-3 py-2 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
+          [class]="statusFilter() === s
+            ? 'bg-emerald-600 text-white border-emerald-600'
+            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+        >
+          {{ s === 'all' ? 'Tất cả' : statusLabel($any(s)) }}
+        </button>
+      }
+    </div>
   </div>
-</div>
 
-<app-confirm-dialog [isOpen]="showDelete()" title="Xóa sản phẩm" message="Bạn có chắc muốn xóa sản phẩm này?" confirmText="Xóa" [danger]="true" (confirmed)="onDeleteConfirmed()" (cancelled)="showDelete.set(false)" />
+  <!-- Products table -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-slate-50 border-b border-slate-200">
+            <th class="text-left px-4 py-3 font-semibold text-slate-600 w-16">Ảnh</th>
+            <th class="text-left px-4 py-3 font-semibold text-slate-600">Sản phẩm</th>
+            <th class="text-left px-4 py-3 font-semibold text-slate-600">Danh mục</th>
+            <th class="text-right px-4 py-3 font-semibold text-slate-600">Giá</th>
+            <th class="text-center px-4 py-3 font-semibold text-slate-600">Tồn kho</th>
+            <th class="text-center px-4 py-3 font-semibold text-slate-600">Trạng thái</th>
+            <th class="text-center px-4 py-3 font-semibold text-slate-600">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of products(); track p.id) {
+            <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+              <td class="px-4 py-3">
+                <img [src]="p.images[0]" [alt]="p.name" class="w-12 h-12 rounded-xl object-cover border border-slate-100" />
+              </td>
+              <td class="px-4 py-3">
+                <div>
+                  <p class="font-medium text-slate-800 line-clamp-1">{{ p.name }}</p>
+                  <p class="text-xs text-slate-400 mt-0.5">
+                    <span class="inline-flex items-center gap-0.5">
+                      ★ {{ p.rating }} ({{ p.reviewCount }}) · Đã bán {{ p.soldCount }}
+                    </span>
+                  </p>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <span class="text-xs px-2 py-1 rounded-lg bg-slate-100 text-slate-600">
+                  {{ p.categoryName }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <p class="font-semibold text-indigo-600">{{ p.price | currencyVnd }}</p>
+                @if (p.originalPrice > p.price) {
+                  <p class="text-xs text-slate-400 line-through">{{ p.originalPrice | currencyVnd }}</p>
+                }
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span [class]="p.stock <= 5 ? 'text-red-600 font-semibold' : 'text-slate-700'">
+                  {{ p.stock }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span class="px-2.5 py-1 rounded-full text-xs font-semibold" [class]="statusClass(p.status)">
+                  {{ statusLabel(p.status) }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-center gap-1">
+                  <button
+                    type="button"
+                    (click)="toggleActive(p)"
+                    class="p-1.5 rounded-lg transition-colors cursor-pointer"
+                    [class]="p.status === 'active'
+                      ? 'text-emerald-600 hover:bg-emerald-50'
+                      : 'text-slate-400 hover:bg-slate-100'"
+                    [title]="p.status === 'active' ? 'Ẩn sản phẩm' : 'Hiển thị sản phẩm'"
+                  >
+                    @if (p.status === 'active') {
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      </svg>
+                    } @else {
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                      </svg>
+                    }
+                  </button>
+                  <button
+                    type="button"
+                    (click)="confirmDelete(p)"
+                    class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                    title="Xóa sản phẩm"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="px-4 py-16 text-center text-slate-400">
+                <div class="flex flex-col items-center gap-3">
+                  <p>Không có sản phẩm nào</p>
+                  <a routerLink="/shop/products/new" class="text-emerald-600 font-semibold hover:underline">
+                    Đăng sản phẩm đầu tiên
+                  </a>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Confirm Delete Dialog -->
+<app-confirm-dialog
+  [isOpen]="showDelete()"
+  title="Xóa sản phẩm"
+  [message]="'Bạn có chắc muốn xóa sản phẩm &quot;' + (deleteTarget()?.name ?? '') + '&quot;? Hành động không thể hoàn tác.'"
+  confirmText="Xóa"
+  [danger]="true"
+  (confirmed)="onDeleteConfirmed()"
+  (cancelled)="showDelete.set(false)"
+/>

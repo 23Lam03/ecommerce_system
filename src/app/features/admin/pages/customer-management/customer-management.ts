@@ -3,11 +3,12 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { User, UserStatus } from '../../../../core/models/user.model';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-admin-customer-management',
   standalone: true,
-  imports: [ConfirmDialog],
+  imports: [ConfirmDialog, DatePipe],
   templateUrl: './customer-management.html',
   styleUrl: './customer-management.css',
 })
@@ -16,15 +17,19 @@ export class CustomerManagementComponent {
   private readonly notification = inject(NotificationService);
 
   protected readonly searchQuery = signal('');
+  protected readonly statusFilter = signal<UserStatus | 'all'>('all');
   protected readonly editUser = signal<User | null>(null);
   protected readonly deactivateTarget = signal<User | null>(null);
   protected readonly showDeactivate = signal(false);
 
   protected readonly customers = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
+    const status = this.statusFilter();
     return this.auth.allUsers().filter(u => {
       if (u.role !== 'customer') return false;
-      return !q || u.fullName.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
+      const matchStatus = status === 'all' || u.status === status;
+      const matchSearch = !q || u.fullName.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || u.phone.includes(q);
+      return matchStatus && matchSearch;
     });
   });
 
@@ -49,6 +54,11 @@ export class CustomerManagementComponent {
       this.auth.updateUserStatus(u.id, 'banned');
       this.notification.success('Đã khóa tài khoản');
     }
+    this.showDeactivate.set(false);
+    this.deactivateTarget.set(null);
+  }
+
+  protected onDeactivateCancelled(): void {
     this.showDeactivate.set(false);
     this.deactivateTarget.set(null);
   }

@@ -1,0 +1,89 @@
+<!-- AD-ADM09: Quản lý đánh giá sản phẩm -->
+<div class="p-6 lg:p-8">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">Quản lý đánh giá</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Mã màn hình: <span class="font-mono text-indigo-600">AD-ADM09</span>
+      <span class="ml-2">· {{ reviews().length }} đánh giá</span>
+    </p>
+  </div>
+
+  <!-- Search -->
+  <div class="mb-6">
+    <div class="relative max-w-sm">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input
+        type="search"
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)"
+        placeholder="Tìm theo sản phẩm, người dùng, nội dung..."
+        class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+      />
+    </div>
+  </div>
+
+  <!-- Reviews list -->
+  <div class="space-y-4">
+    @for (review of reviews(); track review.id) {
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5" [class.opacity-50]="review.isHidden">
+        <div class="flex items-start justify-between gap-3 mb-3">
+          <div class="flex items-center gap-3">
+            <img [src]="review.userAvatar" [alt]="review.userName" class="w-10 h-10 rounded-full border border-slate-200" />
+            <div>
+              <p class="font-semibold text-slate-800 text-sm">{{ review.userName }}</p>
+              <div class="flex items-center gap-0.5 mt-0.5">
+                @for (star of [1,2,3,4,5]; track star) {
+                  <span class="text-sm" [class]="starClass(review.rating, star)">★</span>
+                }
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            @if (review.isHidden) {
+              <span class="px-2 py-0.5 bg-slate-200 text-slate-600 text-xs font-medium rounded-lg">Đã ẩn</span>
+            }
+            <span class="text-xs text-slate-400">{{ fmtDate(review.createdAt) }}</span>
+          </div>
+        </div>
+
+        <p class="text-xs font-medium text-indigo-700 bg-indigo-50 inline-block px-2 py-1 rounded-lg mb-3">
+          {{ review.productName }}
+        </p>
+
+        <p class="text-sm text-slate-700 mb-3">{{ review.comment }}</p>
+
+        @if (review.shopReply) {
+          <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-3">
+            <p class="text-xs font-semibold text-emerald-700 mb-1">Phản hồi của shop:</p>
+            <p class="text-sm text-emerald-800">{{ review.shopReply }}</p>
+          </div>
+        }
+
+        <div class="flex gap-2">
+          @if (review.isHidden) {
+            <button type="button" (click)="hideReview(review.id)"
+              class="px-3 py-1.5 text-xs font-medium border border-emerald-200 text-emerald-700 rounded-lg hover:bg-emerald-50 cursor-pointer">
+              Hiện lại
+            </button>
+          } @else {
+            <button type="button" (click)="hideReview(review.id)"
+              class="px-3 py-1.5 text-xs font-medium border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 cursor-pointer">
+              Ẩn đánh giá
+            </button>
+          }
+          <button type="button" (click)="deleteReview(review.id)"
+            class="px-3 py-1.5 text-xs font-medium border border-red-200 text-red-600 rounded-lg hover:bg-red-50 cursor-pointer">
+            Xóa vĩnh viễn
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="text-center py-16 text-slate-400 bg-white rounded-2xl border border-slate-200">
+        Không có đánh giá nào
+      </div>
+    }
+  </div>
+</div>

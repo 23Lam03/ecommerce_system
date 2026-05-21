@@ -15,7 +15,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
 export class ProductPostingComponent {
   private readonly fb = inject(FormBuilder);
   private readonly productService = inject(ProductService);
-  private readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
   private readonly notification = inject(NotificationService);
   private readonly router = inject(Router);
 
@@ -23,6 +23,7 @@ export class ProductPostingComponent {
   protected readonly isSubmitting = signal(false);
   protected readonly isDragging = signal(false);
   protected readonly previewImages = signal<string[]>([]);
+  protected readonly Math = Math;
 
   protected readonly shopContext = computed(() => {
     const user = this.auth.currentUser();
@@ -159,5 +160,13 @@ export class ProductPostingComponent {
   protected resetForm(): void {
     this.form.reset({ name: '', description: '', price: null, originalPrice: null, categoryId: '', stock: 1 });
     this.previewImages.set([]);
+  }
+
+  protected remainingSlots(): number {
+    return Math.max(0, 5 - this.previewImages().length);
+  }
+
+  protected placeholderArray(): number[] {
+    return Array(this.remainingSlots()).fill(0);
   }
 }

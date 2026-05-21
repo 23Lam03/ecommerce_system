@@ -1,132 +1,89 @@
 <!-- SH-PRD01: Đăng sản phẩm mới -->
-<div class="p-6 lg:p-8 max-w-4xl mx-auto">
+<section class="max-w-3xl mx-auto px-4 py-8">
+  <!-- Header -->
   <div class="mb-8">
-    <h1 class="text-2xl lg:text-3xl font-bold text-slate-900">Đăng sản phẩm mới</h1>
+    <div class="flex items-center gap-3 mb-1">
+      <a routerLink="/shop/products" class="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+        ← Quay lại danh sách
+      </a>
+    </div>
+    <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">Đăng sản phẩm mới</h1>
     <p class="text-sm text-slate-500 mt-1">
       Mã màn hình: <span class="font-mono text-emerald-600">SH-PRD01</span>
-      · Cửa hàng: <span class="font-medium text-slate-700">{{ shopContext().shopName }}</span>
     </p>
   </div>
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6" novalidate>
-    <!-- Tên sản phẩm -->
-    <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
-      <label for="name" class="block text-sm font-semibold text-slate-800 mb-2">
-        Tên sản phẩm <span class="text-red-500">*</span>
-      </label>
-      <input
-        id="name"
-        type="text"
-        formControlName="name"
-        placeholder="VD: iPhone 15 Pro Max 256GB"
-        class="w-full px-4 py-3 text-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
-        [class.border-red-400]="fieldError('name')"
-        [class.border-slate-200]="!fieldError('name')"
-      />
-      @if (fieldError('name'); as err) {
-        <p class="mt-1.5 text-xs text-red-600 font-medium">{{ err }}</p>
-      }
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-8" novalidate>
+    <!-- Cửa hàng context -->
+    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center gap-3">
+      <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+      </svg>
+      <div>
+        <p class="text-sm font-semibold text-emerald-800">{{ shopContext().shopName }}</p>
+        <p class="text-xs text-emerald-600">Sản phẩm sẽ được gửi phê duyệt trước khi hiển thị</p>
+      </div>
     </div>
 
-    <!-- Hình ảnh - Drag & Drop -->
-    <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
-      <label class="block text-sm font-semibold text-slate-800 mb-2">
-        Hình ảnh sản phẩm <span class="text-red-500">*</span>
-        <span class="font-normal text-slate-400">(tối đa 5 ảnh)</span>
-      </label>
+    <!-- Thông tin cơ bản -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+      <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 text-sm flex items-center justify-center font-bold">1</span>
+        Thông tin cơ bản
+      </h2>
 
-      <div
-        class="relative border-2 border-dashed rounded-2xl p-8 text-center transition-colors cursor-pointer"
-        [class.border-emerald-400]="isDragging()"
-        [class.bg-emerald-50]="isDragging()"
-        [class.border-slate-300]="!isDragging()"
-        [class.hover:border-emerald-400]="!isDragging()"
-        [class.hover:bg-slate-50]="!isDragging()"
-        (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave($event)"
-        (drop)="onDrop($event)"
-      >
+      <!-- Tên sản phẩm -->
+      <div>
+        <label for="product-name" class="block text-sm font-medium text-slate-700 mb-1.5">
+          Tên sản phẩm <span class="text-red-500">*</span>
+        </label>
         <input
-          type="file"
-          accept="image/*"
-          multiple
-          class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          (change)="onFileSelect($event)"
+          id="product-name"
+          type="text"
+          formControlName="name"
+          placeholder="VD: iPhone 15 Pro Max 256GB — Titan Tự Nhiên"
+          class="w-full px-4 py-3 text-sm border rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
+          [class.border-red-400]="fieldError('name')"
+          [class.border-slate-200]="!fieldError('name')"
         />
-        <svg class="w-12 h-12 mx-auto text-slate-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-        </svg>
-        <p class="text-sm font-medium text-slate-700">Kéo thả ảnh vào đây hoặc <span class="text-emerald-600">bấm để chọn</span></p>
-        <p class="text-xs text-slate-400 mt-1">PNG, JPG, WEBP — tối đa 5MB/ảnh</p>
+        @if (fieldError('name'); as err) {
+          <p class="mt-1.5 text-xs text-red-600 font-medium">{{ err }}</p>
+        }
       </div>
 
-      @if (previewImages().length > 0) {
-        <div class="grid grid-cols-3 sm:grid-cols-5 gap-3 mt-4">
-          @for (img of previewImages(); track $index) {
-            <div class="relative group aspect-square rounded-xl overflow-hidden border border-slate-200">
-              <img [src]="img" alt="Preview" class="w-full h-full object-cover" />
-              <button
-                type="button"
-                (click)="removeImage($index)"
-                class="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                aria-label="Xóa ảnh"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-              </button>
-            </div>
+      <!-- Mô tả sản phẩm -->
+      <div>
+        <label for="product-description" class="block text-sm font-medium text-slate-700 mb-1.5">
+          Mô tả sản phẩm <span class="text-red-500">*</span>
+        </label>
+        <textarea
+          id="product-description"
+          formControlName="description"
+          rows="5"
+          placeholder="Mô tả chi tiết về sản phẩm: tính năng, thông số kỹ thuật, chất liệu, hướng dẫn sử dụng..."
+          class="w-full px-4 py-3 text-sm border rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 resize-none"
+          [class.border-red-400]="fieldError('description')"
+          [class.border-slate-200]="!fieldError('description')"
+        ></textarea>
+        <div class="flex justify-between mt-1">
+          @if (fieldError('description'); as err) {
+            <p class="text-xs text-red-600 font-medium">{{ err }}</p>
+          } @else {
+            <span></span>
           }
+          <span class="text-xs text-slate-400">{{ form.controls.description.value?.length ?? 0 }}/2000</span>
         </div>
-      } @else {
-        <p class="mt-2 text-xs text-red-600 font-medium">* Cần ít nhất 1 hình ảnh khi đăng</p>
-      }
-    </div>
+      </div>
 
-    <!-- Giá & Danh mục -->
-    <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <!-- Danh mục -->
       <div>
-        <label for="price" class="block text-sm font-semibold text-slate-800 mb-2">
-          Giá bán (₫) <span class="text-red-500">*</span>
-        </label>
-        <input
-          id="price"
-          type="number"
-          formControlName="price"
-          placeholder="1000000"
-          min="1000"
-          class="w-full px-4 py-3 text-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
-          [class.border-red-400]="fieldError('price')"
-          [class.border-slate-200]="!fieldError('price')"
-        />
-        @if (fieldError('price'); as err) {
-          <p class="mt-1.5 text-xs text-red-600 font-medium">{{ err }}</p>
-        }
-      </div>
-      <div>
-        <label for="originalPrice" class="block text-sm font-semibold text-slate-800 mb-2">
-          Giá gốc (₫) <span class="text-slate-400 font-normal">(tùy chọn)</span>
-        </label>
-        <input
-          id="originalPrice"
-          type="number"
-          formControlName="originalPrice"
-          placeholder="1200000"
-          min="1000"
-          class="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
-        />
-        @if (fieldError('originalPrice'); as err) {
-          <p class="mt-1.5 text-xs text-red-600 font-medium">{{ err }}</p>
-        }
-      </div>
-      <div>
-        <label for="categoryId" class="block text-sm font-semibold text-slate-800 mb-2">
-          Danh mục <span class="text-red-500">*</span>
+        <label for="category" class="block text-sm font-medium text-slate-700 mb-1.5">
+          Danh mục sản phẩm <span class="text-red-500">*</span>
         </label>
         <select
-          id="categoryId"
+          id="category"
           formControlName="categoryId"
-          class="w-full px-4 py-3 text-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 bg-white"
+          class="w-full px-4 py-3 text-sm border rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-white"
           [class.border-red-400]="fieldError('categoryId')"
           [class.border-slate-200]="!fieldError('categoryId')"
         >
@@ -139,51 +96,171 @@
           <p class="mt-1.5 text-xs text-red-600 font-medium">{{ err }}</p>
         }
       </div>
-      <div>
-        <label for="stock" class="block text-sm font-semibold text-slate-800 mb-2">
-          Tồn kho <span class="text-red-500">*</span>
-        </label>
+    </div>
+
+    <!-- Hình ảnh -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+      <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 text-sm flex items-center justify-center font-bold">2</span>
+        Hình ảnh sản phẩm <span class="text-red-500">*</span>
+      </h2>
+
+      <!-- Drop zone -->
+      <div
+        class="border-2 border-dashed rounded-2xl p-8 text-center transition-colors cursor-pointer"
+        [class.border-emerald-400]="isDragging()"
+        [class.bg-emerald-50]="isDragging()"
+        [class.border-slate-200]="!isDragging()"
+        [class.bg-slate-50]="!isDragging()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        (click)="fileInput.click()"
+      >
         <input
-          id="stock"
-          type="number"
-          formControlName="stock"
-          min="1"
-          class="w-full px-4 py-3 text-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
-          [class.border-red-400]="fieldError('stock')"
-          [class.border-slate-200]="!fieldError('stock')"
+          #fileInput
+          type="file"
+          accept="image/*"
+          multiple
+          class="hidden"
+          (change)="onFileSelect($event)"
         />
-        @if (fieldError('stock'); as err) {
-          <p class="mt-1.5 text-xs text-red-600 font-medium">{{ err }}</p>
-        }
+        <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mx-auto mb-4 shadow-sm">
+          <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <p class="font-semibold text-slate-700 mb-1">Kéo thả hình ảnh vào đây</p>
+        <p class="text-sm text-slate-500">hoặc nhấp để chọn từ máy tính</p>
+        <p class="text-xs text-slate-400 mt-2">Hỗ trợ JPG, PNG, WEBP · Tối đa 5 ảnh</p>
+      </div>
+
+      <!-- Preview images -->
+      @if (previewImages().length > 0) {
+        <div class="grid grid-cols-5 gap-3">
+          @for (img of previewImages(); track $index; let i = $index) {
+            <div class="relative aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-100 group">
+              <img [src]="img" alt="Preview" class="w-full h-full object-cover" />
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <button
+                  type="button"
+                  (click)="removeImage(i)"
+                  class="p-2 bg-white rounded-full text-red-500 hover:bg-red-50 transition-colors shadow-lg cursor-pointer"
+                  aria-label="Xóa ảnh"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+              @if (i === 0) {
+                <span class="absolute top-1 left-1 px-1.5 py-0.5 bg-emerald-500 text-white text-[10px] font-bold rounded-md">Ảnh bìa</span>
+              }
+            </div>
+          }
+          @for (empty of placeholderArray(); track $index) {
+            <div class="aspect-square rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50 transition-colors"
+                 (click)="fileInput.click()">
+              <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+            </div>
+          }
+        </div>
+        <p class="text-xs text-slate-500 text-center">{{ previewImages().length }}/5 ảnh đã tải lên</p>
+      }
+    </div>
+
+    <!-- Giá cả & Tồn kho -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+      <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 text-sm flex items-center justify-center font-bold">3</span>
+        Giá cả & Tồn kho
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <!-- Giá bán -->
+        <div>
+          <label for="price" class="block text-sm font-medium text-slate-700 mb-1.5">
+            Giá bán <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <input
+              id="price"
+              type="number"
+              formControlName="price"
+              min="1000"
+              step="1000"
+              placeholder="0"
+              class="w-full px-4 py-3 pr-12 text-sm border rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              [class.border-red-400]="fieldError('price')"
+              [class.border-slate-200]="!fieldError('price')"
+            />
+            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-400">₫</span>
+          </div>
+          @if (fieldError('price'); as err) {
+            <p class="mt-1.5 text-xs text-red-600 font-medium">{{ err }}</p>
+          }
+        </div>
+
+        <!-- Giá gốc -->
+        <div>
+          <label for="original-price" class="block text-sm font-medium text-slate-700 mb-1.5">
+            Giá gốc <span class="text-slate-400 font-normal">(tùy chọn)</span>
+          </label>
+          <div class="relative">
+            <input
+              id="original-price"
+              type="number"
+              formControlName="originalPrice"
+              min="1000"
+              step="1000"
+              placeholder="0"
+              class="w-full px-4 py-3 pr-12 text-sm border rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              [class.border-red-400]="fieldError('originalPrice')"
+              [class.border-slate-200]="!fieldError('originalPrice')"
+            />
+            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-400">₫</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-400">Để trống sẽ tự động tính +20%</p>
+        </div>
+
+        <!-- Tồn kho -->
+        <div>
+          <label for="stock" class="block text-sm font-medium text-slate-700 mb-1.5">
+            Số lượng tồn kho <span class="text-red-500">*</span>
+          </label>
+          <input
+            id="stock"
+            type="number"
+            formControlName="stock"
+            min="1"
+            max="99999"
+            placeholder="1"
+            class="w-full px-4 py-3 text-sm border rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            [class.border-red-400]="fieldError('stock')"
+            [class.border-slate-200]="!fieldError('stock')"
+          />
+          @if (fieldError('stock'); as err) {
+            <p class="mt-1.5 text-xs text-red-600 font-medium">{{ err }}</p>
+          }
+        </div>
       </div>
     </div>
 
-    <!-- Mô tả -->
-    <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
-      <label for="description" class="block text-sm font-semibold text-slate-800 mb-2">
-        Mô tả chi tiết <span class="text-red-500">*</span>
-      </label>
-      <textarea
-        id="description"
-        formControlName="description"
-        rows="6"
-        placeholder="Mô tả đầy đủ về sản phẩm, thông số kỹ thuật, chính sách bảo hành..."
-        class="w-full px-4 py-3 text-sm border rounded-xl resize-y focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
-        [class.border-red-400]="fieldError('description')"
-        [class.border-slate-200]="!fieldError('description')"
-      ></textarea>
-      @if (fieldError('description'); as err) {
-        <p class="mt-1.5 text-xs text-red-600 font-medium">{{ err }}</p>
-      }
-      <p class="text-xs text-slate-400 mt-1">{{ form.controls.description.value.length }} / 2000 ký tự</p>
-    </div>
-
     <!-- Actions -->
-    <div class="flex flex-col sm:flex-row gap-3">
+    <div class="flex flex-col sm:flex-row gap-3 sm:justify-end pb-8">
+      <button
+        type="button"
+        (click)="resetForm()"
+        class="px-6 py-3 border border-slate-200 text-slate-600 font-semibold rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
+      >
+        Làm mới form
+      </button>
       <button
         type="submit"
         [disabled]="isSubmitting()"
-        class="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-emerald-600 text-white font-bold rounded-xl
+        class="flex items-center justify-center gap-2 px-8 py-3.5 bg-emerald-600 text-white font-bold rounded-xl
                hover:bg-emerald-700 active:scale-[0.98] transition-all shadow-lg shadow-emerald-200
                disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
       >
@@ -192,24 +269,14 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
           </svg>
-          Đang đăng...
+          Đang gửi...
         } @else {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+          </svg>
           Đăng sản phẩm
         }
       </button>
-      <button
-        type="button"
-        (click)="resetForm()"
-        class="px-6 py-3.5 border border-slate-300 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
-      >
-        Làm mới
-      </button>
-      <a
-        routerLink="/shop/products"
-        class="px-6 py-3.5 text-center text-emerald-700 font-semibold rounded-xl hover:bg-emerald-50 transition-colors"
-      >
-        Danh sách SP
-      </a>
     </div>
   </form>
-</div>
+</section>

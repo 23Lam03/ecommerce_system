@@ -1,0 +1,77 @@
+<!-- SH-FIN01: Tài chính cửa hàng -->
+<section class="p-6 lg:p-8">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">Tài chính cửa hàng</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Mã màn hình: <span class="font-mono text-emerald-600">SH-FIN01</span>
+    </p>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-5 text-white shadow-lg shadow-emerald-200">
+      <p class="text-sm opacity-80">Tổng doanh thu</p>
+      <p class="text-xl font-bold mt-1">{{ totalRevenue() | currencyVnd }}</p>
+    </div>
+    <div class="bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl p-5 text-white shadow-lg shadow-amber-200">
+      <p class="text-sm opacity-80">Chờ thanh toán</p>
+      <p class="text-xl font-bold mt-1">{{ pendingRevenue() | currencyVnd }}</p>
+    </div>
+    <div class="bg-gradient-to-br from-red-400 to-red-600 rounded-2xl p-5 text-white shadow-lg shadow-red-200">
+      <p class="text-sm opacity-80">Phí nền tảng (2%)</p>
+      <p class="text-xl font-bold mt-1">{{ platformFee() | currencyVnd }}</p>
+    </div>
+    <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl p-5 text-white shadow-lg shadow-indigo-200">
+      <p class="text-sm opacity-80">Lợi nhuận thực</p>
+      <p class="text-xl font-bold mt-1">{{ netProfit() | currencyVnd }}</p>
+    </div>
+  </div>
+
+  <!-- Financial breakdown -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Revenue breakdown -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+      <h2 class="text-lg font-bold text-slate-800 mb-4">Chi tiết thu chi</h2>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-600">Tổng doanh thu</span>
+          <span class="font-semibold text-emerald-600">{{ totalRevenue() | currencyVnd }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-600">Phí nền tảng (2%)</span>
+          <span class="font-semibold text-red-500">-{{ platformFee() | currencyVnd }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-600">Chi phí vận chuyển</span>
+          <span class="font-semibold text-red-500">-{{ shippingCost() | currencyVnd }}</span>
+        </div>
+        <div class="pt-3 border-t border-slate-200">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-900">Lợi nhuận thực nhận</span>
+            <span class="font-bold text-xl text-indigo-600">{{ netProfit() | currencyVnd }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly bar chart -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+      <h2 class="text-lg font-bold text-slate-800 mb-4">Doanh thu theo tháng</h2>
+      <div class="space-y-3">
+        @for (m of monthlyStats; track m.month) {
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-500 w-8 shrink-0">{{ m.month }}</span>
+            <div class="flex-1 h-6 bg-slate-100 rounded-lg overflow-hidden relative">
+              <div
+                class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-lg transition-all"
+                [style.width.%]="(m.revenue / 267000000) * 100"
+              ></div>
+            </div>
+            <span class="text-xs font-semibold text-slate-700 w-28 text-right shrink-0">{{ m.revenue | currencyVnd }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>

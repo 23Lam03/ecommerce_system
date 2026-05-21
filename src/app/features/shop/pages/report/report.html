@@ -1,0 +1,73 @@
+<!-- SH-RPT01: Báo cáo doanh số -->
+<section class="p-6 lg:p-8">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">Báo cáo doanh số</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Mã màn hình: <span class="font-mono text-emerald-600">SH-RPT01</span>
+    </p>
+  </div>
+
+  <!-- Stats cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+      <p class="text-sm text-slate-500 mb-1">Tổng doanh thu</p>
+      <p class="text-xl font-bold text-emerald-600">{{ totalRevenue() | currencyVnd }}</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+      <p class="text-sm text-slate-500 mb-1">Tổng đơn hàng</p>
+      <p class="text-xl font-bold text-slate-800">{{ totalOrders() }}</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+      <p class="text-sm text-slate-500 mb-1">Đơn hoàn thành</p>
+      <p class="text-xl font-bold text-indigo-600">{{ completedOrders() }}</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+      <p class="text-sm text-slate-500 mb-1">Đơn đang xử lý</p>
+      <p class="text-xl font-bold text-amber-600">{{ pendingOrders() }}</p>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8">
+    <h2 class="text-lg font-bold text-slate-800 mb-6">Biểu đồ doanh thu 6 tháng gần nhất</h2>
+    <div class="flex items-end gap-4 justify-around h-48">
+      @for (d of monthlyData; track d.month) {
+        <div class="flex flex-col items-center gap-2 flex-1">
+          <p class="text-xs font-semibold text-slate-700">{{ d.revenue | currencyVnd }}</p>
+          <div
+            class="w-full max-w-12 bg-gradient-to-t from-indigo-600 to-indigo-400 rounded-t-lg transition-all hover:from-indigo-700 hover:to-indigo-500"
+            [style.height.px]="barHeight(d.revenue)"
+          ></div>
+          <p class="text-xs text-slate-500">{{ d.month }}</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Summary by status -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-200">
+      <h2 class="text-lg font-bold text-slate-800">Tóm tắt đơn hàng theo trạng thái</h2>
+    </div>
+    <div class="p-6">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        @for (item of [
+          { label: 'Chờ xử lý', value: orders().filter(o => o.status === 'pending').length, color: 'bg-amber-100 text-amber-800' },
+          { label: 'Đã xác nhận', value: orders().filter(o => o.status === 'confirmed').length, color: 'bg-blue-100 text-blue-800' },
+          { label: 'Đang chuẩn bị', value: orders().filter(o => o.status === 'processing').length, color: 'bg-indigo-100 text-indigo-800' },
+          { label: 'Đang giao', value: orders().filter(o => o.status === 'shipping').length, color: 'bg-sky-100 text-sky-800' },
+          { label: 'Đã giao', value: orders().filter(o => o.status === 'delivered').length, color: 'bg-emerald-100 text-emerald-800' },
+          { label: 'Đã hủy', value: orders().filter(o => o.status === 'cancelled').length, color: 'bg-red-100 text-red-800' },
+          { label: 'Trả hàng', value: orders().filter(o => o.status === 'returned').length, color: 'bg-slate-200 text-slate-700' },
+          { label: 'Tổng cộng', value: orders().length, color: 'bg-slate-800 text-white' }
+        ]; track item.label) {
+          <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100">
+            <span class="text-sm text-slate-600">{{ item.label }}</span>
+            <span class="text-sm font-bold px-2.5 py-0.5 rounded-lg" [class]="item.color">{{ item.value }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
