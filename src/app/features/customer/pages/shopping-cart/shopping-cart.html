@@ -1,0 +1,328 @@
+<!-- CTM-ORD01: Giỏ hàng -->
+<section class="max-w-7xl mx-auto px-4 py-6 sm:py-8 pb-28 lg:pb-8">
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
+    <a routerLink="/" class="hover:text-indigo-600 transition-colors">Trang chủ</a>
+    <span>/</span>
+    <span class="text-slate-800 font-medium">Giỏ hàng</span>
+  </nav>
+
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">Giỏ hàng của bạn</h1>
+      <p class="text-sm text-slate-500 mt-1">
+        Mã màn hình: <span class="font-mono text-indigo-600">CTM-ORD01</span>
+        @if (!isEmpty()) {
+          <span class="ml-2">· {{ cartService.totalItems() }} sản phẩm</span>
+        }
+      </p>
+    </div>
+    @if (!isEmpty()) {
+      <button
+        type="button"
+        (click)="clearCart()"
+        class="self-start sm:self-auto text-sm text-red-600 hover:text-red-700 font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+      >
+        Xóa tất cả
+      </button>
+    }
+  </div>
+
+  @if (isEmpty()) {
+    <!-- Empty state -->
+    <div class="flex flex-col items-center justify-center py-16 sm:py-24 bg-white rounded-2xl border border-slate-200 shadow-sm">
+      <div class="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-6">
+        <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+      </div>
+      <h2 class="text-xl font-semibold text-slate-800">Giỏ hàng trống</h2>
+      <p class="text-slate-500 text-sm mt-2 text-center max-w-sm px-4">
+        Bạn chưa thêm sản phẩm nào. Khám phá ngay hàng ngàn ưu đãi hấp dẫn!
+      </p>
+      <a
+        routerLink="/products"
+        class="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-lg shadow-indigo-200"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        Tiếp tục mua sắm
+      </a>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+      <!-- Cart items list -->
+      <div class="lg:col-span-2 space-y-4">
+        @for (item of items(); track item.productId) {
+          <article
+            class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-opacity duration-200"
+            [class.opacity-50]="removingProductId() === item.productId"
+          >
+            <div class="flex gap-3 sm:gap-4 p-4">
+              <!-- Product image -->
+              <a routerLink="/products" class="shrink-0">
+                <img
+                  [src]="item.productImage"
+                  [alt]="item.productName"
+                  class="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl border border-slate-100 bg-slate-50"
+                  loading="lazy"
+                />
+              </a>
+
+              <!-- Product info -->
+              <div class="flex-1 min-w-0 flex flex-col">
+                <div class="flex justify-between gap-2">
+                  <div class="min-w-0">
+                    <h3 class="font-semibold text-slate-900 text-sm sm:text-base line-clamp-2">
+                      {{ item.productName }}
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-0.5">{{ item.shopName }}</p>
+                  </div>
+                  <button
+                    type="button"
+                    (click)="removeItem(item.productId)"
+                    [disabled]="removingProductId() === item.productId"
+                    class="shrink-0 p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                    aria-label="Xóa sản phẩm"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="mt-2 flex flex-wrap items-end justify-between gap-3">
+                  <!-- Price -->
+                  <div class="flex items-baseline gap-2">
+                    <span class="text-indigo-600 font-bold text-base sm:text-lg">
+                      {{ item.price | currencyVnd }}
+                    </span>
+                    @if (hasDiscount(item)) {
+                      <span class="text-xs text-slate-400 line-through">
+                        {{ item.originalPrice | currencyVnd }}
+                      </span>
+                    }
+                  </div>
+
+                  <!-- Quantity controls -->
+                  <div class="flex items-center gap-1 bg-slate-100 rounded-xl p-0.5">
+                    <button
+                      type="button"
+                      (click)="decrement(item)"
+                      [disabled]="item.quantity <= 1"
+                      class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                      aria-label="Giảm số lượng"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                      </svg>
+                    </button>
+                    <input
+                      type="number"
+                      [value]="item.quantity"
+                      (change)="onQuantityInput(item, $event)"
+                      min="1"
+                      [max]="item.stock"
+                      class="w-10 h-8 text-center text-sm font-semibold bg-transparent border-0 focus:outline-none focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      aria-label="Số lượng"
+                    />
+                    <button
+                      type="button"
+                      (click)="increment(item)"
+                      [disabled]="item.quantity >= item.stock"
+                      class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                      aria-label="Tăng số lượng"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <p class="text-xs text-slate-400 mt-2">
+                  Còn {{ item.stock }} sản phẩm · Thành tiền:
+                  <span class="font-semibold text-slate-600">{{ itemSubtotal(item) | currencyVnd }}</span>
+                </p>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+
+      <!-- Order summary sidebar -->
+      <aside class="lg:col-span-1">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 lg:sticky lg:top-24">
+          <h2 class="text-lg font-bold text-slate-900 mb-4">Tóm tắt đơn hàng</h2>
+
+          <!-- Coupon form -->
+          <div class="mb-5 pb-5 border-b border-slate-100">
+            <label for="coupon-code" class="block text-sm font-medium text-slate-700 mb-2">
+              Mã giảm giá
+            </label>
+            @if (cartService.appliedCoupon(); as coupon) {
+              <div class="flex items-center justify-between gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+                <div>
+                  <span class="font-mono font-bold text-emerald-700">{{ coupon.code }}</span>
+                  <p class="text-xs text-emerald-600 mt-0.5">
+                    @if (coupon.discountType === 'percentage') {
+                      Giảm {{ coupon.discountValue }}%
+                    } @else {
+                      Giảm {{ coupon.discountValue | currencyVnd }}
+                    }
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  (click)="removeCoupon()"
+                  class="text-xs text-red-600 hover:text-red-700 font-medium px-2 py-1 rounded hover:bg-red-50 cursor-pointer"
+                >
+                  Gỡ mã
+                </button>
+              </div>
+            } @else {
+              <form [formGroup]="couponForm" (ngSubmit)="applyCoupon()" class="space-y-2">
+                <div class="flex gap-2">
+                  <input
+                    id="coupon-code"
+                    type="text"
+                    formControlName="code"
+                    placeholder="Nhập mã (VD: WELCOME10)"
+                    class="flex-1 px-3 py-2.5 text-sm border rounded-xl transition-colors
+                           focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500
+                           uppercase placeholder:normal-case"
+                    [class.border-red-400]="getCouponError()"
+                    [class.border-slate-200]="!getCouponError()"
+                  />
+                  <button
+                    type="submit"
+                    [disabled]="isApplyingCoupon()"
+                    class="shrink-0 px-4 py-2.5 bg-slate-800 text-white text-sm font-semibold rounded-xl
+                           hover:bg-slate-900 active:scale-[0.98] transition-all cursor-pointer
+                           disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    @if (isApplyingCoupon()) {
+                      <span class="inline-flex items-center gap-1">
+                        <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                        </svg>
+                      </span>
+                    } @else {
+                      Áp dụng
+                    }
+                  </button>
+                </div>
+                @if (getCouponError(); as err) {
+                  <p class="text-xs text-red-600 font-medium">{{ err }}</p>
+                }
+                @if (couponMessage(); as msg) {
+                  <p
+                    class="text-xs font-medium"
+                    [class.text-emerald-600]="msg.type === 'success'"
+                    [class.text-red-600]="msg.type === 'error'"
+                  >
+                    {{ msg.text }}
+                  </p>
+                }
+              </form>
+              <p class="text-[11px] text-slate-400 mt-2">
+                Gợi ý: WELCOME10, SALE50K, MEGA20
+              </p>
+            }
+          </div>
+
+          <!-- Price breakdown -->
+          <dl class="space-y-3 text-sm">
+            <div class="flex justify-between text-slate-600">
+              <dt>Tạm tính</dt>
+              <dd class="font-medium text-slate-800">{{ cartService.subtotal() | currencyVnd }}</dd>
+            </div>
+            @if (cartService.discountAmount() > 0) {
+              <div class="flex justify-between text-emerald-600">
+                <dt>Giảm giá</dt>
+                <dd class="font-medium">-{{ cartService.discountAmount() | currencyVnd }}</dd>
+              </div>
+            }
+            <div class="flex justify-between text-slate-600">
+              <dt>Phí vận chuyển</dt>
+              <dd class="font-medium text-slate-800">
+                @if (shippingFee() === 0) {
+                  <span class="text-emerald-600">Miễn phí</span>
+                } @else {
+                  {{ shippingFee() | currencyVnd }}
+                }
+              </dd>
+            </div>
+            <div class="flex justify-between pt-3 border-t border-slate-200 text-base">
+              <dt class="font-bold text-slate-900">Tổng cộng</dt>
+              <dd class="font-bold text-indigo-600 text-lg">{{ grandTotal() | currencyVnd }}</dd>
+            </div>
+          </dl>
+
+          <!-- Desktop checkout -->
+          <button
+            type="button"
+            (click)="proceedToCheckout()"
+            [disabled]="isCheckingOut()"
+            class="hidden lg:flex w-full mt-6 items-center justify-center gap-2 px-6 py-3.5
+                   bg-indigo-600 text-white font-bold rounded-xl
+                   hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-lg shadow-indigo-200
+                   disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+          >
+            @if (isCheckingOut()) {
+              <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              Đang xử lý...
+            } @else {
+              Tiến hành thanh toán
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            }
+          </button>
+
+          <a
+            routerLink="/products"
+            class="hidden lg:block text-center text-sm text-indigo-600 hover:text-indigo-700 font-medium mt-3"
+          >
+            ← Tiếp tục mua sắm
+          </a>
+        </div>
+      </aside>
+    </div>
+  }
+</section>
+
+<!-- Mobile sticky checkout bar -->
+@if (!isEmpty()) {
+  <div class="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-white border-t border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] p-4 safe-area-pb">
+    <div class="flex items-center justify-between gap-4 max-w-7xl mx-auto">
+      <div>
+        <p class="text-xs text-slate-500">Tổng thanh toán</p>
+        <p class="text-lg font-bold text-indigo-600">{{ grandTotal() | currencyVnd }}</p>
+      </div>
+      <button
+        type="button"
+        (click)="proceedToCheckout()"
+        [disabled]="isCheckingOut()"
+        class="flex-1 max-w-[200px] flex items-center justify-center gap-2 px-4 py-3
+               bg-indigo-600 text-white font-bold rounded-xl text-sm
+               hover:bg-indigo-700 active:scale-[0.98] transition-all
+               disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+      >
+        @if (isCheckingOut()) {
+          <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+        } @else {
+          Thanh toán
+        }
+      </button>
+    </div>
+  </div>
+}

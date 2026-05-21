@@ -1,0 +1,56 @@
+<div class="p-6 lg:p-8">
+  <h1 class="text-2xl lg:text-3xl font-bold text-slate-900 mb-1">Quản lý đơn hàng</h1>
+  <p class="text-sm text-slate-500 mb-6">Mã: <span class="font-mono text-indigo-600">AD-ADM03</span></p>
+
+  <div class="bg-white rounded-2xl border p-4 mb-6 flex flex-col sm:flex-row gap-3 shadow-sm">
+    <input type="search" [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)" placeholder="Mã đơn, tên khách..."
+      class="flex-1 px-4 py-2.5 text-sm border border-slate-200 rounded-xl" />
+    <select [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)" class="px-4 py-2.5 text-sm border rounded-xl bg-white min-w-[150px]">
+      <option value="all">Tất cả</option>
+      @for (s of statusOptions; track s) {
+        <option [value]="s">{{ statusLabel(s) }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="bg-white rounded-2xl border shadow-sm overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 border-b">
+        <tr>
+          <th class="text-left px-4 py-3 font-semibold">Mã đơn</th>
+          <th class="text-left px-4 py-3 font-semibold hidden md:table-cell">Khách / Shop</th>
+          <th class="text-right px-4 py-3 font-semibold">Tổng</th>
+          <th class="text-center px-4 py-3 font-semibold">Trạng thái</th>
+          <th class="text-right px-4 py-3 font-semibold">Cập nhật</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y">
+        @for (o of orders(); track o.id) {
+          <tr class="hover:bg-slate-50">
+            <td class="px-4 py-3 font-mono font-medium">{{ o.orderCode }}</td>
+            <td class="px-4 py-3 hidden md:table-cell">
+              <p>{{ o.customerName }}</p>
+              <p class="text-xs text-slate-400">{{ o.shopName }}</p>
+            </td>
+            <td class="px-4 py-3 text-right font-medium">{{ o.finalAmount | currencyVnd }}</td>
+            <td class="px-4 py-3 text-center">
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold" [class]="statusClass(o.status)">{{ statusLabel(o.status) }}</span>
+            </td>
+            <td class="px-4 py-3 text-right">
+              @if (nextStatus(o.status); as next) {
+                <button type="button" (click)="advanceStatus(o)" [disabled]="updatingId() === o.id"
+                  class="px-3 py-1.5 text-xs font-semibold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-60 cursor-pointer">
+                  {{ updatingId() === o.id ? '...' : '→ ' + statusLabel(next) }}
+                </button>
+              } @else {
+                <span class="text-xs text-slate-400">—</span>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5" class="px-4 py-12 text-center text-slate-400">Không có đơn hàng</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

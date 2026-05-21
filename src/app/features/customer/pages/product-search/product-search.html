@@ -1,0 +1,105 @@
+<section class="max-w-7xl mx-auto px-4 py-6 sm:py-8">
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">Tìm kiếm sản phẩm</h1>
+    <p class="text-sm text-slate-500 mt-1">Mã: <span class="font-mono text-indigo-600">CTM-PRD01</span> · {{ products().length }} kết quả</p>
+  </div>
+
+  <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Sidebar filters -->
+    <aside class="lg:w-72 shrink-0">
+      <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4 sticky top-20">
+        <h2 class="font-semibold text-slate-800">Bộ lọc</h2>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Từ khóa</label>
+          <input type="search" formControlName="keyword" placeholder="Tên sản phẩm..."
+            class="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/30" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Danh mục</label>
+          <select formControlName="categoryId" class="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white">
+            <option value="">Tất cả</option>
+            @for (cat of categories(); track cat.id) {
+              <option [value]="cat.id">{{ cat.icon }} {{ cat.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Giá từ (₫)</label>
+            <input type="number" formControlName="minPrice" min="0" class="w-full px-2 py-2 text-sm border border-slate-200 rounded-lg" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Giá đến (₫)</label>
+            <input type="number" formControlName="maxPrice" min="0" class="w-full px-2 py-2 text-sm border border-slate-200 rounded-lg" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Đánh giá tối thiểu</label>
+          <select formControlName="minRating" class="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white">
+            <option value="">Tất cả</option>
+            <option value="4">★ 4+</option>
+            <option value="4.5">★ 4.5+</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Sắp xếp</label>
+          <select formControlName="sortBy" class="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white">
+            <option value="newest">Mới nhất</option>
+            <option value="price-asc">Giá thấp → cao</option>
+            <option value="price-desc">Giá cao → thấp</option>
+            <option value="best-selling">Bán chạy</option>
+            <option value="rating">Đánh giá cao</option>
+          </select>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button type="submit" class="flex-1 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 cursor-pointer">Áp dụng</button>
+          <button type="button" (click)="resetFilters()" class="px-3 py-2.5 border border-slate-200 text-sm rounded-xl hover:bg-slate-50 cursor-pointer">Reset</button>
+        </div>
+      </form>
+    </aside>
+
+    <!-- Product grid -->
+    <div class="flex-1 grid grid-cols-2 md:grid-cols-3 gap-4">
+      @for (p of products(); track p.id) {
+        <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+          <div class="aspect-square bg-slate-50 relative">
+            <img [src]="p.images[0]" [alt]="p.name" class="w-full h-full object-cover" loading="lazy" />
+            @if (p.originalPrice > p.price) {
+              <span class="absolute top-2 left-2 px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-lg">
+                -{{ ((1 - p.price / p.originalPrice) * 100) | number:'1.0-0' }}%
+              </span>
+            }
+          </div>
+          <div class="p-3 flex flex-col flex-1">
+            <p class="text-xs text-slate-400">{{ p.shopName }}</p>
+            <h3 class="text-sm font-semibold text-slate-900 line-clamp-2 mt-0.5 flex-1">{{ p.name }}</h3>
+            <div class="flex items-center gap-0.5 mt-1">
+              @for (star of renderStars(p.rating); track star) {
+                <span class="text-xs" [class.text-amber-400]="star <= p.rating" [class.text-slate-200]="star > p.rating">★</span>
+              }
+              <span class="text-xs text-slate-400 ml-1">({{ p.reviewCount }})</span>
+            </div>
+            <div class="mt-2 flex items-baseline gap-2">
+              <span class="font-bold text-indigo-600">{{ p.price | currencyVnd }}</span>
+              @if (p.originalPrice > p.price) {
+                <span class="text-xs text-slate-400 line-through">{{ p.originalPrice | currencyVnd }}</span>
+              }
+            </div>
+            <button type="button" (click)="addToCart(p.id)" [disabled]="addingId() === p.id"
+              class="mt-3 w-full py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-60 cursor-pointer">
+              @if (addingId() === p.id) { Đang thêm... } @else { Thêm giỏ hàng }
+            </button>
+          </div>
+        </article>
+      } @empty {
+        <div class="col-span-full py-16 text-center text-slate-400">Không tìm thấy sản phẩm phù hợp</div>
+      }
+    </div>
+  </div>
+</section>

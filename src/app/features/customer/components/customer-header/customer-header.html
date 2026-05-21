@@ -1,0 +1,59 @@
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center justify-between h-14 sm:h-16">
+      <a routerLink="/" class="flex items-center gap-2 shrink-0">
+        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white font-bold text-sm">E</span>
+        <span class="font-bold text-slate-900 text-lg hidden xs:block">EcoMart</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1">
+        <a
+          routerLink="/products"
+          routerLinkActive="text-indigo-600 bg-indigo-50"
+          class="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-slate-50 transition-colors"
+        >Sản phẩm</a>
+        <a
+          routerLink="/promotions"
+          routerLinkActive="text-indigo-600 bg-indigo-50"
+          class="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-slate-50 transition-colors"
+        >Ưu đãi</a>
+        <a
+          routerLink="/orders"
+          routerLinkActive="text-indigo-600 bg-indigo-50"
+          class="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-slate-50 transition-colors"
+        >Đơn hàng</a>
+      </nav>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a
+          routerLink="/cart"
+          routerLinkActive="text-indigo-600"
+          class="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-indigo-600 transition-colors"
+          aria-label="Giỏ hàng"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+          @if (cartCount() > 0) {
+            <span class="absolute -top-0.5 -right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-600 px-1 text-[10px] font-bold text-white">
+              {{ cartCount() > 99 ? '99+' : cartCount() }}
+            </span>
+          }
+        </a>
+        <a
+          routerLink="/login"
+          class="hidden sm:inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold text-indigo-600 border border-indigo-200 hover:bg-indigo-50 transition-colors"
+        >Đăng nhập</a>
+        <button
+          type="button"
+          class="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100"
+          aria-label="Menu"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

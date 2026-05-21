@@ -1,0 +1,35 @@
+<div class="p-6 lg:p-8">
+  <h1 class="text-2xl font-bold text-slate-900 mb-1">Đơn hàng từ khách</h1>
+  <p class="text-sm text-slate-500 mb-6">Mã: <span class="font-mono text-emerald-600">SH-ORD01</span></p>
+
+  <select [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)" class="mb-4 px-4 py-2.5 text-sm border rounded-xl bg-white">
+    <option value="all">Tất cả</option>
+    <option value="pending">Mới</option>
+    <option value="confirmed">Xác nhận</option>
+    <option value="shipping">Đang giao</option>
+    <option value="delivered">Hoàn tất</option>
+  </select>
+
+  <div class="space-y-4">
+    @for (o of orders(); track o.id) {
+      <article class="bg-white rounded-2xl border p-4 shadow-sm">
+        <div class="flex flex-wrap justify-between gap-2 mb-3">
+          <div>
+            <p class="font-mono font-bold">{{ o.orderCode }}</p>
+            <p class="text-sm text-slate-500">{{ o.customerName }} · {{ o.customerPhone }}</p>
+          </div>
+          <p class="font-bold text-emerald-600">{{ o.finalAmount | currencyVnd }}</p>
+        </div>
+        <p class="text-xs text-slate-500 mb-3">{{ o.items.length }} sản phẩm · {{ o.shippingAddress }}</p>
+        @if (nextStatus(o.status); as next) {
+          <button type="button" (click)="advance(o)" [disabled]="updatingId() === o.id"
+            class="w-full sm:w-auto px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 disabled:opacity-60 cursor-pointer">
+            {{ updatingId() === o.id ? 'Đang cập nhật...' : 'Chuyển → ' + statusLabel(next) }}
+          </button>
+        }
+      </article>
+    } @empty {
+      <p class="text-center py-12 text-slate-400">Không có đơn hàng</p>
+    }
+  </div>
+</div>

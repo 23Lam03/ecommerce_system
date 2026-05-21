@@ -1,0 +1,52 @@
+<div class="p-6 lg:p-8">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Sản phẩm của shop</h1>
+      <p class="text-sm text-slate-500">Mã: <span class="font-mono text-emerald-600">SH-PRD02</span></p>
+    </div>
+    <a routerLink="/shop/products/new" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 cursor-pointer">
+      + Đăng sản phẩm
+    </a>
+  </div>
+
+  <select [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)" class="mb-4 px-4 py-2.5 text-sm border rounded-xl bg-white">
+    <option value="all">Tất cả</option>
+    <option value="active">Đang bán</option>
+    <option value="pending">Chờ duyệt</option>
+    <option value="inactive">Ẩn</option>
+  </select>
+
+  <div class="bg-white rounded-2xl border overflow-hidden shadow-sm">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 border-b"><tr>
+        <th class="text-left px-4 py-3">Sản phẩm</th>
+        <th class="text-right px-4 py-3 hidden sm:table-cell">Giá</th>
+        <th class="text-center px-4 py-3">Kho</th>
+        <th class="text-center px-4 py-3">TT</th>
+        <th class="text-right px-4 py-3">Thao tác</th>
+      </tr></thead>
+      <tbody class="divide-y">
+        @for (p of products(); track p.id) {
+          <tr class="hover:bg-slate-50">
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-3">
+                <img [src]="p.images[0]" class="w-10 h-10 rounded-lg object-cover" [alt]="p.name" />
+                <span class="font-medium line-clamp-1">{{ p.name }}</span>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-right hidden sm:table-cell">{{ p.price | currencyVnd }}</td>
+            <td class="px-4 py-3 text-center">{{ p.stock }}</td>
+            <td class="px-4 py-3 text-center"><span class="text-xs px-2 py-1 rounded-full font-semibold" [class]="statusClass(p.status)">{{ statusLabel(p.status) }}</span></td>
+            <td class="px-4 py-3 text-right">
+              <button type="button" (click)="confirmDelete(p)" class="text-red-600 text-xs font-semibold hover:underline cursor-pointer">Xóa</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5" class="py-12 text-center text-slate-400">Chưa có sản phẩm</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<app-confirm-dialog [isOpen]="showDelete()" title="Xóa sản phẩm" message="Bạn có chắc muốn xóa sản phẩm này?" confirmText="Xóa" [danger]="true" (confirmed)="onDeleteConfirmed()" (cancelled)="showDelete.set(false)" />
